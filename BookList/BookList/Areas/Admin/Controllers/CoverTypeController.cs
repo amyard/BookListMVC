@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using BookList.DataAccess.Repository.IRepository;
 using BookList.Models;
+using BookList.Utility;
+using Dapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookList.Areas.Admin.Controllers
@@ -17,6 +19,7 @@ namespace BookList.Areas.Admin.Controllers
         {
             _uniofWork = uniofWork;
         }
+        
         public IActionResult Index()
         {
             return View();
@@ -32,8 +35,10 @@ namespace BookList.Areas.Admin.Controllers
             }
 
             // using for edit
-            CoverType = _uniofWork.CoverType.Get(id.GetValueOrDefault());
-            if(CoverType == null)
+            var parameter = new DynamicParameters();
+            parameter.Add("@Id", id);                         // use "@Id"   - because we use such parameter in migrations
+            CoverType = _uniofWork.SP_Call.OneRecord<CoverType>(SD.Proc_CoverType_Get, parameter);
+            if (CoverType == null)
             {
                 return NotFound();
             }
@@ -47,15 +52,20 @@ namespace BookList.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                if(CoverType.Id == 0)
+                var parameter = new DynamicParameters();
+                parameter.Add("@Name", CoverType.Name);
+
+                if (CoverType.Id == 0)
                 {
-                    _uniofWork.CoverType.Add(CoverType);
+                    _uniofWork.SP_Call.Execute(SD.Proc_CoverType_Create, parameter);
                 }
                 else
                 {
-                    _uniofWork.CoverType.Update(CoverType);
+                    parameter.Add("@Id", CoverType.Id);
+                    _uniofWork.SP_Call.Execute(SD.Proc_CoverType_Update, parameter);
                 }
                 _uniofWork.Save();
+
                 // return RedirectToAction("Index");
                 return RedirectToAction(nameof(Index));
             }
@@ -67,20 +77,23 @@ namespace BookList.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            var allObj = _uniofWork.CoverType.GetAll();
+            var allObj = _uniofWork.SP_Call.List<CoverType>(SD.Proc_CoverType_GetAll, null);
             return Json(new { data = allObj });
         }
 
         [HttpDelete]
         public IActionResult Delete(int id)
         {
-            var objFromDb = _uniofWork.CoverType.Get(id);
+            var parameter = new DynamicParameters();
+            parameter.Add("@Id", id);     // use "@Id"   - because we use such parameter in migrations
+            var objFromDb = _uniofWork.SP_Call.OneRecord<CoverType>(SD.Proc_CoverType_Get, parameter);
+
             if(objFromDb == null)
             {
                 return Json(new { success = false, message = "Error while deleting" });
             }
 
-            _uniofWork.CoverType.Remove(objFromDb);
+            _uniofWork.SP_Call.Execute(SD.Proc_CoverType_Delete, parameter);
             _uniofWork.Save();
             return Json(new { success = true, message = "Delete Successful" });
         }
