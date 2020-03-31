@@ -27,41 +27,41 @@ namespace BookList.Areas.Admin.Controllers
 
         public IActionResult Upsert(int? id)
         {
-            CoverType CoverType = new CoverType();
+            CoverType сoverType = new CoverType();
             if(id == null)
             {
                 // using for create
-                return View(CoverType);
+                return View(сoverType);
             }
 
             // using for edit
             var parameter = new DynamicParameters();
             parameter.Add("@Id", id);                         // use "@Id"   - because we use such parameter in migrations
-            CoverType = _uniofWork.SP_Call.OneRecord<CoverType>(SD.Proc_CoverType_Get, parameter);
-            if (CoverType == null)
+            сoverType = _uniofWork.SP_Call.OneRecord<CoverType>(SD.Proc_CoverType_Get, parameter);
+            if (сoverType == null)
             {
                 return NotFound();
             }
-            return View(CoverType);
+            return View(сoverType);
         }
 
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Upsert(CoverType CoverType)
+        public IActionResult Upsert(CoverType сoverType)
         {
             if (ModelState.IsValid)
             {
                 var parameter = new DynamicParameters();
-                parameter.Add("@Name", CoverType.Name);
+                parameter.Add("@Name", сoverType.Name);
 
-                if (CoverType.Id == 0)
+                if (сoverType.Id == 0)
                 {
                     _uniofWork.SP_Call.Execute(SD.Proc_CoverType_Create, parameter);
                 }
                 else
                 {
-                    parameter.Add("@Id", CoverType.Id);
+                    parameter.Add("@Id", сoverType.Id);
                     _uniofWork.SP_Call.Execute(SD.Proc_CoverType_Update, parameter);
                 }
                 _uniofWork.Save();
@@ -69,7 +69,7 @@ namespace BookList.Areas.Admin.Controllers
                 // return RedirectToAction("Index");
                 return RedirectToAction(nameof(Index));
             }
-            return View(CoverType);
+            return View(сoverType);
         }
 
 
@@ -83,7 +83,7 @@ namespace BookList.Areas.Admin.Controllers
 
         [HttpDelete]
         public IActionResult Delete(int id)
-        {
+        { 
             var parameter = new DynamicParameters();
             parameter.Add("@Id", id);     // use "@Id"   - because we use such parameter in migrations
             var objFromDb = _uniofWork.SP_Call.OneRecord<CoverType>(SD.Proc_CoverType_Get, parameter);

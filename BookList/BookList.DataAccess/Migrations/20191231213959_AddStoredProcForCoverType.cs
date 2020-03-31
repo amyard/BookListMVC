@@ -2,7 +2,7 @@
 
 namespace BookList.DataAccess.Migrations
 {
-    public partial class AddStoredProcedureToCoverType : Migration
+    public partial class AddStoredProcForCoverType : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

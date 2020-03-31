@@ -4,22 +4,24 @@ using BookList.DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BookList.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20191231220154_addValidationToProduct")]
+    partial class addValidationToProduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.3")
+                .HasAnnotation("ProductVersion", "3.1.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("BookList.Models.Category", b =>
+            modelBuilder.Entity("BulkyBook.Models.Category", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -36,7 +38,7 @@ namespace BookList.DataAccess.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("BookList.Models.CoverType", b =>
+            modelBuilder.Entity("BulkyBook.Models.CoverType", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -53,7 +55,7 @@ namespace BookList.DataAccess.Migrations
                     b.ToTable("CoverTypes");
                 });
 
-            modelBuilder.Entity("BookList.Models.Product", b =>
+            modelBuilder.Entity("BulkyBook.Models.Product", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -305,15 +307,15 @@ namespace BookList.DataAccess.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("BookList.Models.Product", b =>
+            modelBuilder.Entity("BulkyBook.Models.Product", b =>
                 {
-                    b.HasOne("BookList.Models.Category", "Category")
+                    b.HasOne("BulkyBook.Models.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BookList.Models.CoverType", "CoverType")
+                    b.HasOne("BulkyBook.Models.CoverType", "CoverType")
                         .WithMany()
                         .HasForeignKey("CoverTypeId")
                         .OnDelete(DeleteBehavior.Cascade)

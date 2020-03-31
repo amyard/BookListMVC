@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BookList.DataAccess.Migrations
 {
-    public partial class defaultMigrationsWithCategory : Migration
+    public partial class AddDefaultIdentityMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

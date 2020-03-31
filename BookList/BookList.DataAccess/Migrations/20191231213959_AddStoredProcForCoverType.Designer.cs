@@ -10,18 +10,18 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookList.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200326230712_CoverTypeMigrations")]
-    partial class CoverTypeMigrations
+    [Migration("20191231213959_AddStoredProcForCoverType")]
+    partial class AddStoredProcForCoverType
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.3")
+                .HasAnnotation("ProductVersion", "3.1.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("BookList.Models.Category", b =>
+            modelBuilder.Entity("BulkyBook.Models.Category", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -38,7 +38,7 @@ namespace BookList.DataAccess.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("BookList.Models.CoverType", b =>
+            modelBuilder.Entity("BulkyBook.Models.CoverType", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
