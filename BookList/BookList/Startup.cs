@@ -35,7 +35,12 @@ namespace BookList
                     b => b.MigrationsAssembly("BookList.DataAccess")
                     ));
 
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+
+            // override to use custom register view - if we have some roles
+            // AddDefaultTokenProviders  - если используем проверку електронной почты
+            //services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            //    .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddIdentity<IdentityUser, IdentityRole>().AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             // register our Repository action
