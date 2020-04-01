@@ -14,6 +14,8 @@ using Microsoft.Extensions.Hosting;
 using BookList.DataAccess.Data;
 using BookList.DataAccess.Repository.IRepository;
 using BookList.DataAccess.Repository;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using BookList.Utility;
 
 namespace BookList
 {
@@ -40,8 +42,13 @@ namespace BookList
             // AddDefaultTokenProviders  - если используем проверку електронной почты
             //services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
             //    .AddEntityFrameworkStores<ApplicationDbContext>();
+
             services.AddIdentity<IdentityUser, IdentityRole>().AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            // to fix IEmailsender error - EmailSender create class in SD
+            services.AddSingleton<IEmailSender, EmailSender>();
+
 
             // register our Repository action
             services.AddScoped<IUnitOfWork, UnitOfWork>();
