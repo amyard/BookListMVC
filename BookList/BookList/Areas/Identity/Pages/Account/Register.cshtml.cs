@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
@@ -80,11 +81,34 @@ namespace BookList.Areas.Identity.Pages.Account
             public string PhoneNumber { get; set; }  // есть как деволтное поле в aspUser model. no need to customize in applicationUser model
             public int? CompanyId { get; set; }
             public string Role { get; set; }
+
+
+            // dropdown
+            public IEnumerable<SelectListItem> CompanyList { get; set; } 
+            public IEnumerable<SelectListItem> RoleList { get; set; } 
         }
 
         public async Task OnGetAsync(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
+
+            // display dropdown for role and company
+            Input = new InputModel
+            {
+                CompanyList = _unitOfWork.Company.GetAll().Select(i => new SelectListItem
+                {
+                    Text = i.Name,
+                    Value = i.Id.ToString()
+                }),
+                RoleList = _roleManager.Roles
+                    .Where(u => u.Name != SD.Role_User_Indi)
+                    .Select(x => x.Name)
+                    .Select(i => new SelectListItem
+                    {
+                        Text = i,
+                        Value = i
+                    }),
+            };
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
