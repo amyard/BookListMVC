@@ -155,8 +155,19 @@ namespace BookList.Areas.Identity.Pages.Account
                         await _roleManager.CreateAsync(new IdentityRole(SD.Role_User_Indi));
                     }
 
-                    await _userManager.AddToRoleAsync(user, SD.Role_Admin);
-
+                    // если не выбрали роль, то как пользователь регистрируем
+                    if(user.Role == null)
+                    {
+                        await _userManager.AddToRoleAsync(user, SD.Role_User_Indi);                   
+                    }
+                    else
+                    {
+                        if(user.CompanyId > 0)
+                        {
+                            await _userManager.AddToRoleAsync(user, SD.Role_User_Comp);
+                        }
+                        await _userManager.AddToRoleAsync(user, user.Role);
+                    }
                     //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     //code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                     //var callbackUrl = Url.Page(
@@ -174,8 +185,16 @@ namespace BookList.Areas.Identity.Pages.Account
                     }
                     else
                     {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
+                        if(user.Role == null)
+                        {
+                            await _signInManager.SignInAsync(user, isPersistent: false);
+                            return LocalRedirect(returnUrl);
+                        }
+                        else
+                        {
+                            // admin is register a new  user
+                            return RedirectToAction("Index", "User", new { Area = "Admin" });
+                        }
                     }
                 }
                 foreach (var error in result.Errors)
