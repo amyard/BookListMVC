@@ -62,6 +62,15 @@ namespace BookList.Areas.Identity.Pages.Account
             public string ConfirmPassword { get; set; }
 
 
+            [Required]
+            public string Name { get; set; }
+            public string StreetAddress { get; set; }
+            public string City { get; set; }
+            public string State { get; set; }
+            public string PostCode { get; set; }
+            public string PhoneNumber { get; set; }  // есть как деволтное поле в aspUser model. no need to customize in applicationUser model
+            public int? CompanyId { get; set; }
+            public string Role { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
