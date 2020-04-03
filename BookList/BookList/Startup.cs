@@ -64,6 +64,12 @@ namespace BookList
                 options.LogoutPath = $"/Identity/Account/Logout";
                 options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
             });
+
+            // facebook and google authentication
+            services.AddAuthentication().AddFacebook(options => {
+                options.AppId = "206323237459761";
+                options.AppSecret = "9f03ae2fb56af97ce6e868c4b2728683";
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
