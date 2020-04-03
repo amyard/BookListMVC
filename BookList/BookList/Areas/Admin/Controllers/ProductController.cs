@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using BookList.DataAccess.Repository.IRepository;
 using BookList.Models;
 using BookList.Models.ViewModels;
+using BookList.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -13,6 +15,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace BookList.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = SD.Role_Admin)]
     public class ProductController : Controller
     {
 

@@ -5,12 +5,15 @@ using System.Threading.Tasks;
 using BookList.DataAccess.Data;
 using BookList.DataAccess.Repository.IRepository;
 using BookList.Models;
+using BookList.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookList.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = SD.Role_Admin + "," + SD.Role_Employee)]
     public class UserController : Controller
     {
 

@@ -4,11 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using BookList.DataAccess.Repository.IRepository;
 using BookList.Models;
+using BookList.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookList.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = SD.Role_Admin + "," + SD.Role_Employee)]
     public class CompanyController : Controller
     {
 
