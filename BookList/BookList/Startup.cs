@@ -48,6 +48,7 @@ namespace BookList
 
             // to fix IEmailsender error - EmailSender create class in SD
             services.AddSingleton<IEmailSender, EmailSender>();
+            services.Configure<EmailOptions>(Configuration);
 
 
             // register our Repository action
