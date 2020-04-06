@@ -70,6 +70,10 @@ namespace BookList
                 options.AppId = "206323237459761";
                 options.AppSecret = "9f03ae2fb56af97ce6e868c4b2728683";
             });
+            services.AddAuthentication().AddGoogle(options => {
+                options.ClientId = "40991471463-h8scof8qio64s79d08b0nsd5fpa79n9d.apps.googleusercontent.com";
+                options.ClientSecret = "aeGaqMRHKCyXukEdqTmY5Egm";
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
