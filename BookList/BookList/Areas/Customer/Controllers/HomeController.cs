@@ -8,6 +8,8 @@ using Microsoft.Extensions.Logging;
 using BookList.Models.ViewModels;
 using BookList.DataAccess.Repository.IRepository;
 using BookList.Models;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace BookList.Areas.Customer.Controllers
 {
@@ -45,6 +47,51 @@ namespace BookList.Areas.Customer.Controllers
             };
             return View(cartObj);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public IActionResult Details(ShoppingCart CartObject)
+        {
+            CartObject.Id = 0;
+            if (ModelState.IsValid)
+            {
+                // we add to cart
+                // 1. get logged user data
+                var claimsIdentity = (ClaimsIdentity)User.Identity;
+                var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+                CartObject.ApplicationUserId = claim.Value;
+
+                // get shop id from db
+                ShoppingCart cartFromDb = _unitOfWork.ShoppingCart.GetFirstOrDefault(
+                        u => u.ApplicationUserId == CartObject.ApplicationUserId && u.ProductId == CartObject.ProductId
+                        , includeProperties:"Product"
+                    );
+                if(cartFromDb == null)
+                {
+                    // no records exists in db for that product for that user
+                    _unitOfWork.ShoppingCart.Add(CartObject);
+                }
+                else
+                {
+                    cartFromDb.Count += CartObject.Count;
+                    _unitOfWork.ShoppingCart.Update(cartFromDb);
+                }
+                _unitOfWork.Save();
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                var productFromDb = _unitOfWork.Product.GetFirstOrDefault(x => x.Id == CartObject.ProductId, includeProperties: "Category,CoverType");
+                ShoppingCart cartObj = new ShoppingCart()
+                {
+                    Product = productFromDb,
+                    ProductId = productFromDb.Id
+                };
+                return View(cartObj);
+            }
+        }
+
 
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
