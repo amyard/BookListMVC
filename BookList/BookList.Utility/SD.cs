@@ -19,6 +19,9 @@ namespace BookList.Utility
         public const string Role_Admin = "Admin";
         public const string Role_Employee = "Employee";
 
+        // session
+        public const string ssShoppingCart = "Shopping Cart Session";
+
 
         // Shopping - count price for product
         public static double GetPriceBasedOnQuantity(double quantity, double price, double price50, double price100)

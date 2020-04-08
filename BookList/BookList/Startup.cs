@@ -75,6 +75,14 @@ namespace BookList
                 options.ClientId = "40991471463-h8scof8qio64s79d08b0nsd5fpa79n9d.apps.googleusercontent.com";
                 options.ClientSecret = "aeGaqMRHKCyXukEdqTmY5Egm";
             });
+
+            // Session
+            services.AddSession(options => 
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -95,6 +103,8 @@ namespace BookList
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseSession();
 
             app.UseAuthentication();
             app.UseAuthorization();

@@ -10,6 +10,8 @@ using BookList.DataAccess.Repository.IRepository;
 using BookList.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using BookList.Utility;
+using Microsoft.AspNetCore.Http;
 
 namespace BookList.Areas.Customer.Controllers
 {
@@ -28,6 +30,19 @@ namespace BookList.Areas.Customer.Controllers
         public IActionResult Index()
         {
             IEnumerable<Product> productList = _unitOfWork.Product.GetAll(includeProperties: "Category,CoverType");
+
+            // get id of logged user
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+            if(claim != null)
+            {
+                var count = _unitOfWork.ShoppingCart
+                    .GetAll(c => c.ApplicationUserId == claim.Value)
+                    .ToList().Count;
+
+                HttpContext.Session.SetInt32(SD.ssShoppingCart, count);
+            }
+
             return View(productList);
         }
 
@@ -78,6 +93,16 @@ namespace BookList.Areas.Customer.Controllers
                     _unitOfWork.ShoppingCart.Update(cartFromDb);
                 }
                 _unitOfWork.Save();
+
+                // session
+                var count = _unitOfWork.ShoppingCart
+                    .GetAll(c => c.ApplicationUserId == CartObject.ApplicationUserId)
+                    .ToList().Count;
+
+                // two line is the same
+                // HttpContext.Session.SetObject(SD.ssShoppingCart, CartObject);
+                HttpContext.Session.SetInt32(SD.ssShoppingCart, count);
+
                 return RedirectToAction(nameof(Index));
             }
             else
