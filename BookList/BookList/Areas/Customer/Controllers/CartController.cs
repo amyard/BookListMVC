@@ -62,7 +62,6 @@ namespace BookList.Areas.Customer.Controllers
             return View(ShoppingCartVM);
         }
 
-
         [HttpPost]
         [ActionName("Index")]
         public async Task<IActionResult> IndexPOST()
@@ -92,7 +91,6 @@ namespace BookList.Areas.Customer.Controllers
 
         }
 
-
         public IActionResult Plus(int cardId)
         {
             var cart = _unitOfWork.ShoppingCart.GetFirstOrDefault(c => c.Id == cardId, includeProperties:"Product");
@@ -101,7 +99,6 @@ namespace BookList.Areas.Customer.Controllers
             _unitOfWork.Save();
             return RedirectToAction(nameof(Index));
         }
-
 
         public IActionResult Minus(int cardId)
         {
@@ -139,6 +136,38 @@ namespace BookList.Areas.Customer.Controllers
             HttpContext.Session.SetInt32(SD.ssShoppingCart, cnt - 1);
  
             return RedirectToAction(nameof(Index));
+        }
+
+
+        public IActionResult Summary()
+        {
+            // get id of logged user
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+
+            ShoppingCartVM = new ShoppingCartVM()
+            {
+                OrderHeader = new Models.OrderHeader(),
+                ListCart = _unitOfWork.ShoppingCart.GetAll(c => c.ApplicationUserId == claim.Value, includeProperties: "Product")
+            };
+
+
+            ShoppingCartVM.OrderHeader.ApplicationUser = _unitOfWork.ApplicationUser
+                                                            .GetFirstOrDefault(c => c.Id == claim.Value, 
+                                                                includeProperties: "Company");
+            foreach (var list in ShoppingCartVM.ListCart)
+            {
+                list.Price = SD.GetPriceBasedOnQuantity(list.Count, list.Product.Price, list.Product.Price50, list.Product.Price100);
+                ShoppingCartVM.OrderHeader.OrderTotal += (list.Price * list.Count);
+            }
+            ShoppingCartVM.OrderHeader.Name = ShoppingCartVM.OrderHeader.ApplicationUser.Name;
+            ShoppingCartVM.OrderHeader.PhoneNumber = ShoppingCartVM.OrderHeader.ApplicationUser.PhoneNumber;
+            ShoppingCartVM.OrderHeader.StreetAddress = ShoppingCartVM.OrderHeader.ApplicationUser.StreetAddress;
+            ShoppingCartVM.OrderHeader.City = ShoppingCartVM.OrderHeader.ApplicationUser.City;
+            ShoppingCartVM.OrderHeader.State = ShoppingCartVM.OrderHeader.ApplicationUser.State;
+            ShoppingCartVM.OrderHeader.PostCode = ShoppingCartVM.OrderHeader.ApplicationUser.PostCode;
+
+            return View(ShoppingCartVM);
         }
     }
 }
