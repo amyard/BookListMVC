@@ -16,6 +16,7 @@ using BookList.DataAccess.Repository.IRepository;
 using BookList.DataAccess.Repository;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using BookList.Utility;
+using Stripe;
 
 namespace BookList
 {
@@ -76,6 +77,9 @@ namespace BookList
                 options.ClientSecret = "aeGaqMRHKCyXukEdqTmY5Egm";
             });
 
+            // stripe - payment section - get data from appsettings.json
+            services.Configure<StripeSettings>(Configuration.GetSection("Stripe"));
+
             // Session
             services.AddSession(options => 
             {
@@ -105,6 +109,8 @@ namespace BookList
             app.UseRouting();
 
             app.UseSession();
+
+            StripeConfiguration.ApiKey = Configuration.GetSection("Stripe")["SecretKey"];
 
             app.UseAuthentication();
             app.UseAuthorization();
