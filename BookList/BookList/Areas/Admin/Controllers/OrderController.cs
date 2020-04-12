@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using BookList.DataAccess.Repository.IRepository;
 using BookList.Models;
+using BookList.Models.ViewModels;
 using BookList.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +17,10 @@ namespace BookList.Areas.Admin.Controllers
     public class OrderController : Controller
     {
         private readonly IUnitOfWork _uniofWork;
+
+        [BindProperty]
+        public OrderDetailsVM OrderVM { get; set; }
+
         public OrderController(IUnitOfWork uniofWork)
         {
             _uniofWork = uniofWork;
@@ -24,6 +29,17 @@ namespace BookList.Areas.Admin.Controllers
         {
             return View();
         }
+
+        public IActionResult Details(int id)
+        {
+            OrderVM = new OrderDetailsVM()
+            {
+                OrderHeader = _uniofWork.OrderHeader.GetFirstOrDefault(u => u.Id == id, includeProperties: "ApplicationUser"),
+                OrderDetails = _uniofWork.OrderDetails.GetAll(o => o.OrderId == id, includeProperties: "Product")
+            };
+            return View(OrderVM);
+        }
+
 
         // API CALSS
         [HttpGet]
