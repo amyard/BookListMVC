@@ -1,6 +1,7 @@
 ﻿@model BookList.Models.ViewModels.OrderDetailsVM
 @using BookList.Utility
-
+@using  Microsoft.Extensions.Options
+@inject IOptions<BookList.Utility.StripeSettings> Stripe
 
 
 <form method="post">
@@ -127,7 +128,7 @@
                                 <div class="col-9">
                                     @if (User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Employee))
                                     {
-                                        <input asp-for="OrderHeader.Carrier" type="text" class="form-control" />
+                                        <input asp-for="OrderHeader.Carrier" id="carrier" type="text" class="form-control" />
                                     }
                                     else
                                     {
@@ -140,7 +141,7 @@
                                 <div class="col-9">
                                     @if (User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Employee))
                                     {
-                                        <input asp-for="OrderHeader.TrackingNumber" type="text" class="form-control" />
+                                        <input asp-for="OrderHeader.TrackingNumber" id="trackingNumber" type="text" class="form-control" />
                                     }
                                     else
                                     {
@@ -157,7 +158,7 @@
                             </div>
 
                             @if (User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Employee))
-                            { 
+                            {
                                 <div class="row my-1">
                                     <div class="col-3">Transaction ID</div>
                                     <div class="col-9">
@@ -208,7 +209,7 @@
                                             </div>
                                         </div>
                                     </li>
-                                }   
+                                }
                                 <li class="list-group-item bg-info">
                                     <div class="row container">
                                         <div class="col-6">
@@ -221,6 +222,59 @@
                                 </li>
                             </ul>
 
+                            @if (User.IsInRole(SD.Role_Employee) || User.IsInRole(SD.Role_Admin))
+                            {
+                                <br />
+                                @if (Model.OrderHeader.OrderStatus == SD.StatusApproved)
+                                {
+                                    <a asp-action="StartProcessing" asp-route-id="@Model.OrderHeader.Id"
+                                       class="btn btn-primary form-control">Start Processing</a>
+                                }
+                                @if (Model.OrderHeader.OrderStatus == SD.StatusInProcess)
+                                {
+                                    <input type="submit" value="Ship Order" onclick=" return validateInput()"
+                                           class="btn btn-primary form-control"
+                                           formaction="/Admin/Order/ShipOrder" formmethod="post">
+                                }
+                            }
+                            else
+                            {
+                                <label class="btn btn-primary form-control">@Model.OrderHeader.OrderStatus</label>
+                            }
+
+
+                            @{
+                                var OrderTotalForStripe = Model.OrderHeader.OrderTotal * 100;
+                            }
+
+                            @if (Model.OrderHeader.PaymentStatus == SD.PaymentStatusPending &&
+                               Model.OrderHeader.OrderStatus == SD.StatusShipped)
+                            {
+                                <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                                        data-key="@Stripe.Value.PublishableKey"
+                                        data-amount="@OrderTotalForStripe"
+                                        data-name="Book List"
+                                        data-label="Place Order"
+                                        data-description="Get Books, For Less"
+                                        data-locale="auto"
+                                        data-allow-remember-me="false"
+                                        data-image="https://stripe.com/img/documentation/checkout/marketplace.png"></script>
+                                <script>
+                                    document.getElementsByClassName("stripe-button-el")[0].style.display = "none";
+                                </script>
+                                <button type="submit" value="Place Order" class="btn btn-success form-control">Pay Now</button>
+                            }
+
+
+                            @if (Model.OrderHeader.OrderStatus != SD.StatusCancelled &&
+                              Model.OrderHeader.OrderStatus != SD.StatusRefunded &&
+                              (User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Employee)))
+                            {
+                                <div class="pt-2">
+                                    <a asp-action="CancelOrder" asp-route-id="@Model.OrderHeader.Id"
+                                       class="btn btn-danger form-control">Cancel Order</a>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
@@ -228,3 +282,37 @@
         </div>
     </div>
 </form>
+
+
+@section Scripts{
+    <script>
+        function validateInput() {
+            var tracking = document.getElementById("trackingNumber").value;
+            var carrier = document.getElementById("carrier").value;
+
+            if (tracking.toString() == "") {
+                swal("Error", "Please, enter the tracking number.", "error")
+                return false;
+            } else if (carrier.toString() == "") {
+                swal("Error", "Please, enter the carrier.", "error")
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+
+        $(document).ready(function () {
+            var shippingDate = document.getElementById("shippingDate");
+            if (shippingDate.value == "1/1/0001") {
+                shippingDate.value = "";
+            }
+
+            var paymentDate = document.getElementById("paymentDate");
+            if (paymentDate.value == "1/1/0001") {
+                paymentDate.value = "";
+            }
+        })
+    </script>
+}
+}
